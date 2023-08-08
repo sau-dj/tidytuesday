@@ -1,0 +1,541 @@
+---
+title: "TidyTuesday_7.25"
+author: "Saurabh Dhananjay Jadhav"
+date: "2023-07-25"
+output: html_document
+---
+
+```{r}
+library (tidyverse)
+library(ggplot2)
+library(fmsb)
+library(patchwork)
+library(showtext)
+
+
+
+```
+
+
+
+```{r}
+scurvy <- readr::read_csv('https://raw.githubusercontent.com/rfordatascience/tidytuesday/master/data/2023/2023-07-25/scurvy.csv')
+
+view(scurvy)
+names(scurvy)
+str(scurvy)
+
+scurvy_cleaned <- scurvy
+scurvy_cleaned$gum_rot_d6 <- gsub("^(\\d).*", "\\1", scurvy_cleaned$gum_rot_d6)
+scurvy_cleaned$skin_sores_d6 <- gsub("^(\\d).*", "\\1", scurvy_cleaned$skin_sores_d6)
+scurvy_cleaned$weakness_of_the_knees_d6<- gsub("^(\\d).*", "\\1", scurvy_cleaned$weakness_of_the_knees_d6)
+scurvy_cleaned$lassitude_d6 <- gsub("^(\\d).*", "\\1", scurvy_cleaned$lassitude_d6)
+
+scurvy_cleaned$gum_rot_d6 <- as.numeric(as.character(scurvy_cleaned$gum_rot_d6))
+scurvy_cleaned$skin_sores_d6 <- as.numeric(as.character(scurvy_cleaned$skin_sores_d6))
+scurvy_cleaned$weakness_of_the_knees_d6 <- as.numeric(as.character(scurvy_cleaned$weakness_of_the_knees_d6))
+scurvy_cleaned$lassitude_d6 <- as.numeric(as.character(scurvy_cleaned$lassitude_d6))
+
+
+view(scurvy_cleaned)
+str(scurvy_cleaned)
+
+```
+
+
+
+
+
+
+```{r}
+
+
+# Filter cider complete cases
+cider <- filter(scurvy_cleaned, treatment == "cider", 
+               complete.cases(gum_rot_d6, skin_sores_d6, weakness_of_the_knees_d6, lassitude_d6))
+cider<- cider[, -c(1, 2, 3, 8)]
+
+# Minimum and maximum rows
+max_values <- c(3, 3, 3, 3) 
+min_values <- c(0, 0, 0, 0)
+
+
+# Bind as first two rows
+cider <- bind_rows(
+  data.frame(gum_rot_d6 = max_values[1],
+             skin_sores_d6 = max_values[2], 
+             weakness_of_the_knees_d6 = max_values[3],
+             lassitude_d6 = max_values[4]),
+  data.frame(gum_rot_d6 = min_values[1],
+             skin_sores_d6 = min_values[2],
+             weakness_of_the_knees_d6 = min_values[3],
+             lassitude_d6 = min_values[4]),
+
+  cider
+)
+
+
+colnames(cider) <- c("Gum root","Skin sores","Weakness of the knees","Lassitude")
+
+cider <- as.data.frame(cider)
+
+str(cider)
+
+
+# Radar plot 
+plot1 <- radarchart(cider, pcol=4 , 
+           seg= 3,
+           cglty = 1,       # Grid line type
+           cglcol = "gray", # Grid line color
+           cglwd = 1,       # Line width of the grid
+           plwd = 2,        # Width of the line
+           plty = 1,
+           pfcol = rgb(0, 0.4, 1, 0.25),
+           axistype = 0,
+           vlcex = 0.42,
+           centerzero = FALSE,
+           pty=1
+           )
+
+op <- par(mar = c(3, 3, 3, 3))
+par(op)
+
+# Formatting       
+title("Cider Treatment", line=1)
+
+
+```
+```{r}
+
+# Filter cider complete cases
+dilute_sulfuric_acid <- filter(scurvy_cleaned, treatment == "dilute_sulfuric_acid", 
+               complete.cases(gum_rot_d6, skin_sores_d6, weakness_of_the_knees_d6, lassitude_d6))
+dilute_sulfuric_acid<- dilute_sulfuric_acid[, -c(1, 2, 3, 8)]
+
+# Minimum and maximum rows
+max_values <- c(3, 3, 3, 3) 
+min_values <- c(0, 0, 0, 0)
+
+
+# Bind as first two rows
+dilute_sulfuric_acid <- bind_rows(
+  data.frame(gum_rot_d6 = max_values[1],
+             skin_sores_d6 = max_values[2], 
+             weakness_of_the_knees_d6 = max_values[3],
+             lassitude_d6 = max_values[4]),
+  data.frame(gum_rot_d6 = min_values[1],
+             skin_sores_d6 = min_values[2],
+             weakness_of_the_knees_d6 = min_values[3],
+             lassitude_d6 = min_values[4]),
+
+  dilute_sulfuric_acid
+)
+
+
+colnames(dilute_sulfuric_acid) <- c("Gum root","Skin sores","Weakness of the knees","Lassitude")
+
+dilute_surfuric_acid <- as.data.frame(dilute_sulfuric_acid)
+
+str(dilute_sulfuric_acid)
+
+# Radar plot 
+plot2 <- radarchart(dilute_sulfuric_acid, pcol=4 , 
+           seg= 3,
+           cglty = 1,       # Grid line type
+           cglcol = "gray", # Grid line color
+           cglwd = 1,       # Line width of the grid
+           plwd = 2,        # Width of the line
+           plty = 1,
+           pfcol = rgb(0, 0.4, 1, 0.25),
+           axistype = 0,
+           vlcex = 0.42,
+           centerzero = FALSE,
+           pty=1
+           )
+
+op <- par(mar = c(1, 1, 1, 1))
+par(op)
+
+# Formatting       
+title("Dilute sulfuric acid Treatment", line=1)
+
+```
+
+
+
+
+
+```{r}
+
+
+# Filter cider complete cases
+vinegar <- filter(scurvy_cleaned, treatment == "vinegar", 
+               complete.cases(gum_rot_d6, skin_sores_d6, weakness_of_the_knees_d6, lassitude_d6))
+vinegar <- vinegar[, -c(1, 2, 3, 8)]
+
+# Minimum and maximum rows
+max_values <- c(3, 3, 3, 3) 
+min_values <- c(0, 0, 0, 0)
+
+
+# Bind as first two rows
+vinegar <- bind_rows(
+  data.frame(gum_rot_d6 = max_values[1],
+             skin_sores_d6 = max_values[2], 
+             weakness_of_the_knees_d6 = max_values[3],
+             lassitude_d6 = max_values[4]),
+  data.frame(gum_rot_d6 = min_values[1],
+             skin_sores_d6 = min_values[2],
+             weakness_of_the_knees_d6 = min_values[3],
+             lassitude_d6 = min_values[4]),
+
+  vinegar
+)
+
+
+colnames(vinegar) <- c("Gum root","Skin sores","Weakness of the knees","Lassitude")
+
+vinegar <- as.data.frame(vinegar)
+
+str(vinegar)
+
+# Radar plot 
+plot3 <- radarchart(vinegar, pcol=4 , 
+           seg= 3,
+           cglty = 1,       # Grid line type
+           cglcol = "gray", # Grid line color
+           cglwd = 1,       # Line width of the grid
+           plwd = 2,        # Width of the line
+           plty = 1,
+           pfcol = rgb(0, 0.4, 1, 0.25),
+           axistype = 0,
+           vlcex = 0.42,
+           centerzero = FALSE,
+           pty=1
+           )
+
+op <- par(mar = c(1, 1, 1, 1))
+par(op)
+
+# Formatting       
+title("Vinegar Treatment", line=1)
+
+```
+
+
+
+```{r}
+
+
+
+# Filter cider complete cases
+sea_water <- filter(scurvy_cleaned, treatment == "sea_water", 
+               complete.cases(gum_rot_d6, skin_sores_d6, weakness_of_the_knees_d6, lassitude_d6))
+sea_water <- sea_water[, -c(1, 2, 3, 8)]
+
+# Minimum and maximum rows
+max_values <- c(3, 3, 3, 3) 
+min_values <- c(0, 0, 0, 0)
+
+
+# Bind as first two rows
+sea_water <- bind_rows(
+  data.frame(gum_rot_d6 = max_values[1],
+             skin_sores_d6 = max_values[2], 
+             weakness_of_the_knees_d6 = max_values[3],
+             lassitude_d6 = max_values[4]),
+  data.frame(gum_rot_d6 = min_values[1],
+             skin_sores_d6 = min_values[2],
+             weakness_of_the_knees_d6 = min_values[3],
+             lassitude_d6 = min_values[4]),
+
+  sea_water
+)
+
+
+colnames(sea_water) <- c("Gum root","Skin sores","Weakness of the knees","Lassitude")
+
+sea_water <- as.data.frame(sea_water)
+
+str(sea_water)
+
+# Radar plot 
+plot4 <- radarchart(sea_water, pcol=4 , 
+           seg= 3,
+           cglty = 1,       # Grid line type
+           cglcol = "gray", # Grid line color
+           cglwd = 1,       # Line width of the grid
+           plwd = 2,        # Width of the line
+           plty = 1,
+           pfcol = rgb(0, 0.4, 1, 0.25),
+           axistype = 0,
+           vlcex = 0.42,
+           centerzero = FALSE,
+           pty=1
+           )
+
+op <- par(mar = c(1, 1, 1, 1))
+par(op)
+
+# Formatting       
+title("Sea water Treatment", line=1)
+```
+
+
+```{r}
+
+
+
+# Filter cider complete cases
+citrus <- filter(scurvy_cleaned, treatment == "citrus", 
+               complete.cases(gum_rot_d6, skin_sores_d6, weakness_of_the_knees_d6, lassitude_d6))
+citrus <- citrus[, -c(1, 2, 3, 8)]
+
+# Minimum and maximum rows
+max_values <- c(3, 3, 3, 3) 
+min_values <- c(0, 0, 0, 0)
+
+
+# Bind as first two rows
+citrus <- bind_rows(
+  data.frame(gum_rot_d6 = max_values[1],
+             skin_sores_d6 = max_values[2], 
+             weakness_of_the_knees_d6 = max_values[3],
+             lassitude_d6 = max_values[4]),
+  data.frame(gum_rot_d6 = min_values[1],
+             skin_sores_d6 = min_values[2],
+             weakness_of_the_knees_d6 = min_values[3],
+             lassitude_d6 = min_values[4]),
+
+  citrus
+)
+
+
+colnames(citrus) <- c("Gum root","Skin sores","Weakness of the knees","Lassitude")
+
+citrus <- as.data.frame(citrus)
+
+str(citrus)
+
+# Radar plot 
+plot5 <- radarchart(citrus, pcol=4 , 
+           seg= 3,
+           cglty = 1,       # Grid line type
+           cglcol = "gray", # Grid line color
+           cglwd = 1,       # Line width of the grid
+           plwd = 2,        # Width of the line
+           plty = 1,
+           pfcol = rgb(0, 0.4, 1, 0.25),
+           axistype = 0,
+           vlcex = 0.42,
+           centerzero = FALSE,
+           pty=1
+           )
+
+op <- par(mar = c(1, 1, 1, 1))
+par(op)
+
+# Formatting       
+title("Citrus Treatment", line=1)
+```
+
+
+
+
+
+
+
+```{r}
+library(fmsb)
+library(gridExtra)
+
+
+
+# Filter cider complete cases
+purgative_mixture <- filter(scurvy_cleaned, treatment == "purgative_mixture", 
+               complete.cases(gum_rot_d6, skin_sores_d6, weakness_of_the_knees_d6, lassitude_d6))
+purgative_mixture <- purgative_mixture[, -c(1, 2, 3, 8)]
+
+# Minimum and maximum rows
+max_values <- c(3, 3, 3, 3) 
+min_values <- c(0, 0, 0, 0)
+
+
+# Bind as first two rows
+purgative_mixture <- bind_rows(
+  data.frame(gum_rot_d6 = max_values[1],
+             skin_sores_d6 = max_values[2], 
+             weakness_of_the_knees_d6 = max_values[3],
+             lassitude_d6 = max_values[4]),
+  data.frame(gum_rot_d6 = min_values[1],
+             skin_sores_d6 = min_values[2],
+             weakness_of_the_knees_d6 = min_values[3],
+             lassitude_d6 = min_values[4]),
+
+  purgative_mixture
+)
+
+
+colnames(purgative_mixture) <- c("Gum root","Skin sores","Weakness of the knees","Lassitude")
+
+purgative_mixture <- as.data.frame(purgative_mixture)
+
+str(purgative_mixture)
+
+# Radar plot 
+plot6 <- radarchart(purgative_mixture, pcol=4 , 
+           seg= 3,
+           cglty = 1,       # Grid line type
+           cglcol = "gray", # Grid line color
+           cglwd = 1,       # Line width of the grid
+           plwd = 2,        # Width of the line
+           plty = 1,
+           pfcol = rgb(0, 0.4, 1, 0.25),
+           axistype = 0,
+           vlcex = 0.42,
+           centerzero = FALSE,
+           pty=1
+           )
+
+op <- par(mar = c(1, 1, 1, 1))
+par(op)
+
+# Formatting       
+title("Purgative Mixture Treatment", line=1)
+
+```
+
+
+
+
+
+
+```{r}
+
+library(tidyverse)
+
+library(extrafont)
+
+
+
+# First, set the default font family
+par(family = "Big Caslon")
+par(family = "Roboto")
+
+
+# Load data
+scurvy <- read_csv("https://raw.githubusercontent.com/rfordatascience/tidytuesday/master/data/2023/2023-07-25/scurvy.csv")
+
+
+# Define colors for specific factor levels using a named vector
+custom_colors <- c("0" = "#29bf12", "1" = "#08BDBD", "2" = "#C04CFD", "3" = "#F21B3F")
+
+
+
+#Adding fonts for plots and axis 
+my_theme <- function() {
+  theme_minimal() +                        
+    theme(
+      plot.title = element_text(hjust=0.5, vjust = 1),
+      axis.text.x = element_text(vjust=0.1, hjust = 0.1 , size=15, angle=25),
+      axis.text.y = element_text(vjust=0.1, hjust = 0.1 , size=20),
+      axis.title.x = element_text(family = "Roboto", size=24),
+      axis.title.y = element_text(family = "Roboto", size = 15)
+    )
+}
+
+
+# Gum rot
+# extracts 2 columns
+gum_data <- scurvy_cleaned %>% 
+  select(gum_rot_d6, treatment)
+#Reshapes gum_data from wide to long format, i.e. into 2 columns symptom and severity
+gum_plot <- gum_data %>% 
+  pivot_longer(cols = treatment,
+               names_to = "symptom",
+               values_to = "severity") 
+
+gum_plot <- ggplot(gum_plot, aes(x = severity, y = gum_rot_d6)) +
+geom_point(size= 2,aes(color = factor(gum_rot_d6)),position = position_jitter(width = 0,height=0.2), show.legend = FALSE) + my_theme() + scale_color_manual(values = custom_colors) + labs(x = NULL, y = "severity") + ggtitle("Gum rot")
+
+
+#skin sores
+skin_data <- scurvy_cleaned %>% 
+  select(skin_sores_d6, treatment)
+
+skin_plot <- skin_data %>% 
+  pivot_longer(cols = treatment,
+               names_to = "symptom",
+               values_to = "severity") 
+
+skin_plot <- ggplot(skin_plot, aes(x = severity, y = skin_sores_d6)) +
+geom_point(size= 2,aes(color = factor(skin_sores_d6)),position = position_jitter(width = 0,height=0.2), show.legend = FALSE) + my_theme() + scale_color_manual(values = custom_colors) + labs(x = NULL, y = "severity") + ggtitle("Skin sores")
+
+
+#weakness of the knees
+knee_data <- scurvy_cleaned %>% 
+  select(weakness_of_the_knees_d6, treatment)
+
+knee_plot <- knee_data %>% 
+  pivot_longer(cols = treatment,
+               names_to = "symptom",
+               values_to = "severity") 
+
+knee_plot <- ggplot(knee_plot, aes(x = severity, y = weakness_of_the_knees_d6)) +
+geom_point(size= 2,aes(color = factor(weakness_of_the_knees_d6)) ,position = position_jitter(width = 0,height=0.2), show.legend = FALSE) + my_theme() + scale_color_manual(values = custom_colors) + labs(x = NULL, y = "severity") + ggtitle("Weakness of the knees")
+
+
+#lassitude
+
+lassitude_data <- scurvy_cleaned %>% 
+  select(lassitude_d6, treatment)
+
+lassitude_plot <- lassitude_data %>% 
+  pivot_longer(cols = treatment,
+               names_to = "symptom",
+               values_to = "severity") 
+
+lassitude_plot <- ggplot(lassitude_plot, aes(x = severity, y = lassitude_d6, color = severity )) +
+geom_point(size = 2 ,aes(color = factor(lassitude_d6)),position = position_jitter(width = 0,height=0.2)) + my_theme() + scale_color_manual(values = custom_colors) + labs(x = NULL, y = "severity") + ggtitle("Lassitude", )
+
+
+
+
+# Defining the main title, subtitle, caption
+main_title <- "Comparison of Scurvy Treatments "
+
+subtitle <- "Scurvy is a disease resulting from a lack of vitamin C."
+
+caption <- "Source: medicaldata R package, Name: Saurabh Jadhav"
+
+
+
+
+
+
+
+# Arrange all the plots, subtitle, and the main title
+combined_plot <- (
+  gum_plot + skin_plot +
+    plot_layout(ncol = 2) +  
+    knee_plot + lassitude_plot +
+    plot_layout(ncol = 2) +  
+    plot_annotation(title = main_title, theme = theme(plot.title = element_text(size = 40, family = "Big Caslon", color = "brown", face = "bold", hjust = 0.5))) +
+    plot_annotation(subtitle = subtitle, theme = theme(plot.subtitle = element_text(size = 34, family = "Big Caslon", face = "bold", color = "black", hjust =0.5))) +
+    plot_annotation(caption = caption, theme = theme(plot.caption = element_text(size = 16, family = "Big Caslon", color = "black",  hjust = 0.5)))  +
+    plot_annotation(theme = theme(panel.background = element_rect(fill = "#cfa868", color  = "#cfa868"),
+      plot.background = element_rect(fill = "#cfa868", color  = "#cfa868")) 
+) ) 
+
+
+
+#Display the combined plot
+print(combined_plot)
+
+
+# Save the combined plot
+ggplot2::ggsave("scurvy.png", combined_plot, width = 7, height = 6, units = "in", dpi =300 )
+
+```
+
+
