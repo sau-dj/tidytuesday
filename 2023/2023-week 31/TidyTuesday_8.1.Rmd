@@ -1,0 +1,103 @@
+
+```{r}
+# Load the required libraries
+library (tidyverse)
+library(maps)
+library(viridis)
+library(camcorder)
+```
+
+
+
+```{r}
+# Read and view data
+
+states <- readr::read_csv('https://raw.githubusercontent.com/rfordatascience/tidytuesday/master/data/2023/2023-08-01/states.csv')
+state_name_etymology <- readr::read_csv('https://raw.githubusercontent.com/rfordatascience/tidytuesday/master/data/2023/2023-08-01/state_name_etymology.csv')
+
+
+
+view(states)
+view(state_name_etymology)
+```
+```{r}
+# Start recording
+gg_record(
+  dir = 'temp.', # where to save the recording
+  device = "jpeg", # device to use to save images
+  width = 8,      # width of saved image
+  height = 6,     # height of saved image
+  units = "in",   # units for width and height
+  dpi = 300       # dpi to use when saving image
+)
+
+
+
+```
+
+
+```{r}
+ ggplot() + ggtitle("\n\n\n\nUS State Admissions") +theme_void()  + theme(plot.title = element_text(hjust = 0.5, vjust = -1, size=24, family = "Roboto", colour = "#8A7E72" ))
+
+```
+
+
+
+
+
+```{r}
+
+
+# Load the USA map data from the maps package
+map_data <- map_data("state") 
+
+
+
+# Lower-casing state data
+states$state <- tolower(states$state)
+
+# filtering out alaska and hawaii, not available in maps library
+states <- states %>% 
+  filter(state != "alaska" & state != "hawaii")
+
+# Match Map_data and states to add admission dates to map_data
+map_data$admission <- states$admission[match(map_data$region, states$state)]
+
+# Function to create a plot for a specific state
+create_state_plot <- function(state_name) 
+  {
+  state_data <- subset(map_data, region == state_name)
+  ggplot() +
+    geom_polygon(data = map_data, aes(x = long, y = lat, group = group), fill = "white", color = "black") +
+    geom_polygon(data = state_data, aes(x = long, y = lat, group = group),fill = viridis::viridis_pal(option = "D")(1), color = "black") +
+    coord_fixed(1.3) + theme_void() +
+ggtitle(sprintf("State: %s\nAdmission Date: %s",toTitleCase(state_data$region),format(state_data$admission,"%B %d, %Y"))) + theme(plot.title = element_text(hjust = 0.5, vjust = 0.5, size=16, family = "Roboto", color = "#0091AD"),
+          panel.background = element_rect(fill = "white")) 
+
+}
+# List of state names
+state_names <- unique(states$state)
+
+
+# Create a list of plots for all states
+lapply(state_names, create_state_plot) 
+
+
+gg_stop_recording()
+
+
+
+gg_playback(
+  name = "Admission_states.gif",
+  frame_duration = .6
+)
+
+```
+
+
+
+
+
+
+
+
